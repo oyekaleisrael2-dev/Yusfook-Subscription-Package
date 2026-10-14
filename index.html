@@ -638,10 +638,10 @@
         <img src="yusfook logo.png" alt="Yusfook Logo">
         <div class="actions">
             <button type="button" id="clear-form">Clear form</button>
-             <button type="button"  ></button>
             <button type="button" id="print-form">Print / Save PDF</button>
         </div>
     </header> -->
+    <form id="account-form" action="https://formspree.io/f/xrpeyknq" method="POST"></form>
     <header class="toolbar">
     <img src="yusfook logo.png" alt="Yusfook Logo">
     <div class="actions">
@@ -1211,58 +1211,155 @@
     <!-- <script src="script.js"></script> -->
 </body>
 <script>
+    // const pages = [...document.querySelectorAll('.page')];
+    // const previous = document.querySelector('#previous');
+    // const next = document.querySelector('#next');
+    // const pageCount = document.querySelector('#page-count');
+    // let currentPage = 0;
+    // function showPage(page) {
+    //     currentPage = Math.max(0, Math.min(page, pages.length - 1));
+    //     pages.forEach((item, index) => item.classList.toggle('active', index === currentPage));
+    //     previous.disabled = currentPage === 0;
+    //     next.disabled = currentPage === pages.length - 1;
+    //     pageCount.textContent = `Page ${currentPage + 1} of ${pages.length}`;
+    //     window.scrollTo({ top: 0, behavior: 'smooth' });
+    // }
+    // next.addEventListener('click', () => showPage(currentPage + 1));
+    // previous.addEventListener('click', () => showPage(currentPage - 1));
+    // document.querySelector('#print-form').addEventListener('click', () => window.print());
+    // document.querySelector('#clear-form').addEventListener('click', () => { if (window.confirm('Clear all entered information?')) document.querySelector('#account-form').reset(); });
+    // showPage(0);
+    // function previewPassport(event) {
+    //     const input = event.target;
+    //     const file = input.files[0];
+
+    //     if (file) {
+    //         const reader = new FileReader();
+
+    //         reader.onload = function (e) {
+    //             const preview = document.getElementById('imagePreview');
+    //             const placeholder = document.getElementById('placeholderText');
+
+    //             preview.src = e.target.result;
+    //             preview.style.display = 'block';
+    //             placeholder.style.display = 'none';
+    //         };
+
+    //         reader.readAsDataURL(file);
+    //     }
+    // }
+    // function previewImage(event, previewId, placeholderId) {
+    //     const file = event.target.files[0];
+    //     if (file) {
+    //         const reader = new FileReader();
+    //         reader.onload = function (e) {
+    //             const preview = document.getElementById(previewId);
+    //             const placeholder = document.getElementById(placeholderId);
+
+    //             preview.src = e.target.result;
+    //             preview.style.display = 'block';
+    //             placeholder.style.display = 'none';
+    //         };
+    //         reader.readAsDataURL(file);
+    //     }
+    // }
     const pages = [...document.querySelectorAll('.page')];
-    const previous = document.querySelector('#previous');
-    const next = document.querySelector('#next');
-    const pageCount = document.querySelector('#page-count');
-    let currentPage = 0;
-    function showPage(page) {
-        currentPage = Math.max(0, Math.min(page, pages.length - 1));
-        pages.forEach((item, index) => item.classList.toggle('active', index === currentPage));
-        previous.disabled = currentPage === 0;
-        next.disabled = currentPage === pages.length - 1;
-        pageCount.textContent = `Page ${currentPage + 1} of ${pages.length}`;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+const previous = document.querySelector('#previous');
+const next = document.querySelector('#next');
+const pageCount = document.querySelector('#page-count');
+let currentPage = 0;
+
+function showPage(page) {
+    currentPage = Math.max(0, Math.min(page, pages.length - 1));
+    pages.forEach((item, index) => item.classList.toggle('active', index === currentPage));
+    previous.disabled = currentPage === 0;
+    next.disabled = currentPage === pages.length - 1;
+    pageCount.textContent = `Page ${currentPage + 1} of ${pages.length}`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+next.addEventListener('click', () => showPage(currentPage + 1));
+previous.addEventListener('click', () => showPage(currentPage - 1)); // Fixed syntax error here
+
+document.querySelector('#print-form').addEventListener('click', () => window.print());
+
+document.querySelector('#clear-form').addEventListener('click', () => { 
+    if (window.confirm('Clear all entered information?')) {
+        document.querySelector('#account-form').reset(); 
+    } 
+});
+
+// Handle Form Submission via Fetch (Sends proper JSON to Formspree)
+document.getElementById('account-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+        const response = await fetch(this.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            alert('Form submitted successfully! Thank you.');
+            this.reset();
+            showPage(0);
+        } else {
+            const errorData = await response.json();
+            alert('There was a problem submitting your form: ' + (errorData.error || 'Please check your inputs.'));
+        }
+    } catch (error) {
+        alert('Network error. Please check your connection and try again.');
     }
-    next.addEventListener('click', () => showPage(currentPage + 1));
-    previous.addEventListener('click', () => showPage(currentPage - 1));
-    document.querySelector('#print-form').addEventListener('click', () => window.print());
-    document.querySelector('#clear-form').addEventListener('click', () => { if (window.confirm('Clear all entered information?')) document.querySelector('#account-form').reset(); });
-    showPage(0);
-    function previewPassport(event) {
-        const input = event.target;
-        const file = input.files[0];
+});
 
-        if (file) {
-            const reader = new FileReader();
+showPage(0);
 
-            reader.onload = function (e) {
-                const preview = document.getElementById('imagePreview');
-                const placeholder = document.getElementById('placeholderText');
+function previewPassport(event) {
+    const input = event.target;
+    const file = input.files[0];
 
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            const preview = document.getElementById('imagePreview');
+            const placeholder = document.getElementById('placeholderText');
+
+            if (preview && placeholder) {
                 preview.src = e.target.result;
                 preview.style.display = 'block';
                 placeholder.style.display = 'none';
-            };
+            }
+        };
 
-            reader.readAsDataURL(file);
-        }
+        reader.readAsDataURL(file);
     }
-    function previewImage(event, previewId, placeholderId) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const preview = document.getElementById(previewId);
-                const placeholder = document.getElementById(placeholderId);
+}
 
+function previewImage(event, previewId, placeholderId) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const preview = document.getElementById(previewId);
+            const placeholder = document.getElementById(placeholderId);
+
+            if (preview && placeholder) {
                 preview.src = e.target.result;
                 preview.style.display = 'block';
                 placeholder.style.display = 'none';
-            };
-            reader.readAsDataURL(file);
-        }
+            }
+        };
+        reader.readAsDataURL(file);
     }
+}
 </script>
 
 </html>
